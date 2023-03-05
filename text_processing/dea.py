@@ -22,7 +22,6 @@ def count_sentences(data):
         and Indonesian (id) language
     """
     languages = data['language'].unique()
-
     all_language_scores = []
     for language in languages:
         language_data = data.loc[lambda x: x['language'] == language]
@@ -43,6 +42,8 @@ def display_data_in_bar(data):
     """
     counts = data['language'].value_counts()
     counts.plot(kind='bar')
+    for i, count in enumerate(counts):
+        plt.text(i, count+0.5, str(count), ha='center', va='bottom')
     plt.title("Language Counts")
     plt.xlabel("Language")
     plt.ylabel("Total (sentence)")
@@ -70,7 +71,7 @@ def display_data_in_boxplot(data):
     plt.show()
 
 
-def display_data_in_gaussian_dist(data, count_sentences=count_sentences, visualized_lines=0):
+def display_data_in_gaussian_dist(data, count_sentences=count_sentences, display_lines=0):
     """ Counts each sentence length for each language.
 
     Args:
@@ -108,9 +109,9 @@ def display_data_in_gaussian_dist(data, count_sentences=count_sentences, visuali
         cut_off = iqr * 1
         # lower, upper = iqr - cut_off, iqr + cut_off
 
-        # Plot
+        # Plot the gaussian distribution
         sns.kdeplot(data_counts[i], shade=True, ax=ax)
-        if visualized_lines == 1:
+        if display_lines == 1:
             ax.axvline(mean_value - cut_off_1, linestyle='dashed',
                        color='green', label='lower boundary for std 1')
             ax.axvline(mean_value + cut_off_1, linestyle='dashed',
@@ -130,7 +131,7 @@ def display_data_in_gaussian_dist(data, count_sentences=count_sentences, visuali
     plt.show()
 
 
-def display_clustering(data, algorithm, title, num_clusters=4, random_state=0, n_components_true=0):
+def display_data_in_clustering(data, algorithm, title, num_clusters=4, random_state=0, n_components_true=0):
     """ Visualize clustering of each language.
 
     Args:

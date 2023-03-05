@@ -42,7 +42,7 @@ def input_text_files(files_path):
 
 
 def split_to_sentences(files_path):
-    """ Split each language to sentences for each language.
+    """ Split each language into sentences.
 
     Args:
         files_path (str): A path to folder where the language files are located.
