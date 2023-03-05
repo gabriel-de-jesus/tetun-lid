@@ -37,7 +37,7 @@ def train_model(convert_features, model_settings, x_train, y_train):
 
     Args:
         convert_features (function): A function to transform text to vector features.
-        model_settings (function): A ML model with parameters (optional).
+        model_settings (function): A ML model with optinal parameters.
         x_train (series): A X_train proportional data using to train the model.
         y_train (series): A y_train proportional contains corresponding label of each line of train dataset.
 
