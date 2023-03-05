@@ -12,11 +12,11 @@ def train_dev_test_split(dataset, test_size_1, test_size_2):
 
     Args:
         dataset (DataFrame): A DataFrame contained the preprocessed data.
-        test_size_1 (float): the test size proportion between train and (dev+test)
-        test_size_2 (float): the test size proportion between dev and test
+        test_size_1 (float): the test size proportion between train and (dev+test).
+        test_size_2 (float): the test size proportion between dev and test.
 
     Returns:
-        The proportion of  X(train, dev, test) and the corresponding y sets
+        The proportion of  X(train, dev, test) and the corresponding y sets.
     """
     corpus = dataset['sentence']
     labels = dataset['language']
@@ -37,7 +37,7 @@ def train_model(convert_features, model_settings, x_train, y_train):
 
     Args:
         convert_features (function): A function to transform text to vector features.
-        model_settings (function): A ML model with optinal parameters.
+        model_settings (function): A ML model with optional parameters.
         x_train (series): A X_train proportional data using to train the model.
         y_train (series): A y_train proportional contains corresponding label of each line of train dataset.
 
@@ -57,7 +57,7 @@ def train_model(convert_features, model_settings, x_train, y_train):
 
 
 def evaluate_model(model, x, y):
-    """ Evaluate the model on development/validation set.
+    """ Evaluate the model on development/validation or test sets.
 
     Args:
         x (series): A X_dev or X_test proportional data using to evaluate the model.

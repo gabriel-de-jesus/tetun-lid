@@ -1,7 +1,7 @@
 import os
 import re
-import pandas as pd
 import numpy as np
+import pandas as pd
 from text_processing.dea import count_sentences
 
 

@@ -1,4 +1,7 @@
 import os
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 from PIL import Image
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import PCA
@@ -6,9 +9,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans, Birch, AgglomerativeClustering
 from text_processing.process_data import *
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 
 
 def count_sentences(data):
