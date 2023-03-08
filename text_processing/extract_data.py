@@ -4,7 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 
 
-def load_tetun_csv_data(csv_file_name, target_file):
+def load_tetun_csv_data(csv_file_name: str, target_file: str) -> None:
     """ Load Tetun dataset from csv file, clean the HTML tags, & save them to text file.
 
     Args:
@@ -23,7 +23,7 @@ def load_tetun_csv_data(csv_file_name, target_file):
             file.write(clean + '\n\n')
 
 
-def load_other_languages_corpus(file_name, target_file):
+def load_other_languages_corpus(file_name: str, target_file: str) -> None:
     """ Load EN, PT and ID compressed files in XZ format and save them to text file.
 
     Args:
@@ -51,9 +51,12 @@ if __name__ == '__main__':
     tetun_text_file = "tet.txt"
     tetun_output_file = "/".join([data_dir, tetun_text_file])
 
-    # Generate Tetun dataset if it does not existed
+    # Generate Tetun dataset if it does not exist.
     if not tetun_text_file in os.listdir(lang_dir):
-        load_tetun_csv_data(tetun_input_file, tetun_output_file)
+        try:
+            load_tetun_csv_data(tetun_input_file, tetun_output_file)
+        except:
+            print("The Tetun csv file does not exist in the lang_files folder.")
     else:
         print(f"The {tetun_text_file} is already generated.")
 
@@ -66,4 +69,4 @@ if __name__ == '__main__':
                                         data_dir + file_name[:2] + ".txt")
     else:
         print(
-            "The XZ files do not exist in the folder of lang_files")
+            "The XZ files do not exist in the lang_files folder.")

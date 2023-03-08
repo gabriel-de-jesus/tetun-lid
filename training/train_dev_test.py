@@ -1,3 +1,4 @@
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.linear_model import LogisticRegression
@@ -5,9 +6,10 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
+from typing import Callable
 
 
-def train_dev_test_split(dataset, test_size_1, test_size_2):
+def train_dev_test_split(dataset: pd.DataFrame, test_size_1: float, test_size_2: float) -> pd.Series:
     """ split data into train, development(dev)/validation and test sets.
 
     Args:
@@ -32,7 +34,12 @@ def train_dev_test_split(dataset, test_size_1, test_size_2):
     return X_train, y_train, X_dev, y_dev, X_test, y_test
 
 
-def train_model(convert_features, model_settings, x_train, y_train):
+def train_model(
+        convert_features: Callable,
+        model_settings: Callable,
+        x_train: list,
+        y_train: list
+) -> object:
     """ Transform the text into vector features and fit into model.
 
     Args:
@@ -56,7 +63,7 @@ def train_model(convert_features, model_settings, x_train, y_train):
     return model
 
 
-def evaluate_model(model, x, y):
+def evaluate_model(model: object, x: pd.Series, y: pd.Series) -> None:
     """ Evaluate the model on development/validation or test sets.
 
     Args:

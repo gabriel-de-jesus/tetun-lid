@@ -9,9 +9,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans, Birch, AgglomerativeClustering
 from text_processing.process_data import *
+from typing import Callable
 
 
-def count_sentences(data):
+def count_sentences(data: pd.DataFrame) -> list:
     """ Counts each sentence length for each language.
 
     Args:
@@ -21,6 +22,7 @@ def count_sentences(data):
         A list contains list of Tetun (tet), Portuguese (pt), English (en),
         and Indonesian (id) language
     """
+
     languages = data['language'].unique()
     all_language_scores = []
     for language in languages:
@@ -31,7 +33,7 @@ def count_sentences(data):
     return all_language_scores
 
 
-def display_data_in_bar(data):
+def display_data_in_bar(data: pd.DataFrame) -> None:
     """ Visualize dataset in a bar plot.
 
     Args:
@@ -40,6 +42,7 @@ def display_data_in_bar(data):
     Results:
         A bar plot illustrates the total sentences for each language.
     """
+
     counts = data['language'].value_counts()
     counts.plot(kind='bar')
     for i, count in enumerate(counts):
@@ -50,7 +53,7 @@ def display_data_in_bar(data):
     plt.show()
 
 
-def display_data_in_boxplot(data):
+def display_data_in_boxplot(data: pd.DataFrame) -> None:
     """ Visualize dataset for each language in boxplot.
 
     Args:
@@ -59,6 +62,7 @@ def display_data_in_boxplot(data):
     Results:
         A plot contains 4 boxplots, one for each language
     """
+
     languages = data['language'].unique()
 
     # Plot in the boxplots
@@ -71,16 +75,22 @@ def display_data_in_boxplot(data):
     plt.show()
 
 
-def display_data_in_gaussian_dist(data, count_sentences=count_sentences, display_lines=0):
+def display_data_in_gaussian_dist(
+        data: pd.DataFrame,
+        count_sentences: list = count_sentences,
+        display_lines: bool = False
+) -> None:
     """ Counts each sentence length for each language.
 
     Args:
         data (DataFrame): a DataFrame contained a preprocessed data.
         sentece_counts (list): a list of language lists.
+        display_lines (bool): whether displaying lines or not (default=False)
 
     Results:
         A plot contains 4 subplots, one for each language
     """
+
     # Get a list of the language
     languages = data['language'].unique()
 
@@ -111,7 +121,7 @@ def display_data_in_gaussian_dist(data, count_sentences=count_sentences, display
 
         # Plot the gaussian distribution
         sns.kdeplot(data_counts[i], shade=True, ax=ax)
-        if display_lines == 1:
+        if display_lines:
             ax.axvline(mean_value - cut_off_1, linestyle='dashed',
                        color='green', label='lower boundary for std 1')
             ax.axvline(mean_value + cut_off_1, linestyle='dashed',
@@ -126,12 +136,17 @@ def display_data_in_gaussian_dist(data, count_sentences=count_sentences, display
 
     # Add padding between subplots
     plt.tight_layout()
-
-    # Show the plot
     plt.show()
 
 
-def display_data_in_clustering(data, algorithm, title, num_clusters=4, random_state=0, n_components_true=0):
+def display_data_in_clustering(
+        data: pd.DataFrame,
+        algorithm: Callable,
+        title: str,
+        num_clusters: int = 4,
+        using_random_state: bool = False,
+        using_n_components: bool = False
+) -> None:
     """ Visualize clustering of each language.
 
     Args:
@@ -139,8 +154,8 @@ def display_data_in_clustering(data, algorithm, title, num_clusters=4, random_st
         algorithm: clustering algorithm name.
         title (str): the graph title.
         um_clusters (int): number of clusters (4 default).
-        num_components_true (binary): whether a n_components parameter is used (default=0).
-        random_state (binary): whether a random_state parameter is used (default=0).
+        num_components (bool): whether a n_components parameter is used (default=False).
+        random_state (bool): whether a random_state parameter is used (default=False).
 
     Results:
         A plot of 2 dimensional.
@@ -171,10 +186,10 @@ def display_data_in_clustering(data, algorithm, title, num_clusters=4, random_st
         label_color_dict[label] = colors[i % len(colors)]
 
     # Apply clustering algorithm with k=4
-    if random_state == 0:
+    if not using_random_state:
         algorithm(n_clusters=num_clusters).fit(norm_sentences)
     else:
-        if n_components_true == 1:
+        if using_n_components:
             algorithm(n_components=num_clusters,
                       random_state=42).fit(norm_sentences)
         else:
@@ -199,7 +214,7 @@ def display_data_in_clustering(data, algorithm, title, num_clusters=4, random_st
     plt.close(fig)
 
 
-def display_images(*args):
+def display_images(*args: str):
     """Visualize images in a plot.
 
     Args:
@@ -210,7 +225,6 @@ def display_images(*args):
     """
     img_dir = "plots/"
 
-    # Open the images
     img1 = Image.open(os.path.join(img_dir, args[0])) if len(
         args) >= 1 else None
     img2 = Image.open(os.path.join(img_dir, args[1])) if len(
@@ -220,16 +234,12 @@ def display_images(*args):
     img4 = Image.open(os.path.join(img_dir, args[3])) if len(
         args) >= 4 else None
 
-    # Create a figure with subplots
     fig, axs = plt.subplots(2, 2, figsize=(16, 12))
-
-    # Display the images in the subplots
     axs[0, 0].imshow(img1) if img1 else None
     axs[0, 1].imshow(img2) if img2 else None
     axs[1, 0].imshow(img3) if img3 else None
     axs[1, 1].imshow(img4) if img4 else None
 
-    # Customize the subplots
     for ax in axs.flat:
         ax.set_xticks([])
         ax.set_yticks([])
@@ -240,5 +250,4 @@ def display_images(*args):
         ax.spines["bottom"].set_visible(False)
         ax.spines["left"].set_visible(False)
 
-    # Show the figure
     plt.show()

@@ -11,7 +11,7 @@ PUNCTUATIONS = ['!', '"', '“', '”', '#', '$', '&', '(', ')', '*', '+',
                 '\\', ']', '^', '`', '{', '|', '}', '~', '-']
 
 
-def load_corpus(file_path):
+def load_corpus(file_path: str) -> str:
     """ Load and read text corpus.
 
     Args:
@@ -26,7 +26,7 @@ def load_corpus(file_path):
     return text_corpus
 
 
-def input_text_files(files_path):
+def input_text_files(files_path: str) -> list:
     """ List of input text files for all languages.
 
     Args:
@@ -41,7 +41,7 @@ def input_text_files(files_path):
     return list_text_files
 
 
-def split_to_sentences(files_path):
+def split_to_sentences(files_path: str) -> tuple:
     """ Split each language into sentences.
 
     Args:
@@ -75,7 +75,7 @@ def split_to_sentences(files_path):
     return tuple(sentences.values())
 
 
-def compile_all_data(files_path):
+def compile_all_data(files_path: str) -> pd.DataFrame:
     """ Save dataset for all four languages in a data frame.
 
       Args:
@@ -92,7 +92,7 @@ def compile_all_data(files_path):
     return dataset
 
 
-def preprocessed_data(files_path):
+def preprocessed_data(files_path: str) -> pd.DataFrame:
     """ Build a clean dataset for all four languages and save in a data frame.
 
       Args:
@@ -116,7 +116,7 @@ def preprocessed_data(files_path):
     return clean_data
 
 
-def clean_data_with_count(files_path):
+def clean_data_with_count(files_path: str) -> pd.DataFrame:
     """ Build a clean dataset with a new column contains sentence length.
 
       Args:
@@ -132,7 +132,7 @@ def clean_data_with_count(files_path):
     return clean_data
 
 
-def removed_sentence_outliers(data):
+def removed_sentence_outliers(data: pd.DataFrame) -> list:
     """ Remove outliers (longest or shortest sentences) from the data
 
     Args:
@@ -155,7 +155,7 @@ def removed_sentence_outliers(data):
     return outlier_removed
 
 
-def final_clean_data(data):
+def final_clean_data(data: pd.DataFrame) -> pd.DataFrame:
     """ Build a final clean dataset excluding the outliers.
 
       Args:
