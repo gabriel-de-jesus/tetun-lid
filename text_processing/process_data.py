@@ -74,10 +74,10 @@ def compile_all_data(files_path: str) -> pd.DataFrame:
     """ Save dataset for all four languages in a data frame.
 
       Args:
-          files_path (str): A path to folder where the language files are located.
+        files_path (str): A path to folder where the language files are located.
 
       Returns:
-          A data frame contains sentences with the respective language.
+        A data frame contains sentences with the respective language.
       """
     tet_sentences, pt_sentences, en_sentences, id_sentences = split_to_sentences(
         files_path)
@@ -92,12 +92,12 @@ def preprocessed_data(files_path: str) -> pd.DataFrame:
     """ Build a clean dataset for all four languages and save in a data frame.
 
       Args:
-          files_path (str): A path to folder where the language files are located.
+        files_path (str): A path to folder where the language files are located.
 
       Returns:
-          A data frame contains sentences with the respective language.
+        A data frame contains sentences with the respective language.
       """
-    punctuation = '!\"“”#$€&()*+,./–:;<=>?@%[\\]^_`{|}~'
+    punctuation = '!\"“”#$€&()*+,./–:;<=>?@%[\\]^_`{|}~\n'
     punctutation_regex = r"[" + re.escape("".join(punctuation)) + "]"
     digit_regex = r"\d+"
     three_dots = r"[…]+"
@@ -112,20 +112,49 @@ def preprocessed_data(files_path: str) -> pd.DataFrame:
     data['sentence'] = data['sentence'].str.replace(hyphen_with_spaces, " ")
 
     data.reset_index(drop=True, inplace=True)
-
-    clean_data = data[data['sentence'] != '']
+    clean_data = data[(data['sentence'] != '') & (data['sentence'] != ' ')]
 
     return clean_data
+
+
+def words_summary(data: pd.DataFrame) -> pd.DataFrame:
+    """ Summarize the words in each sentence and the overall total.
+
+      Args:
+        data (DataFrame): A DataFrame contained the preprocessed data.
+
+      Returns:
+        A data frame contains the summary of words for each sentence.
+      """
+    summary = []
+    for lang in data['language'].unique():
+        sentence_list = data['sentence'][data['language'] == lang]
+        words = sentence_list.str.split()
+        words_count = words.apply(len)
+        max_words = words_count.max()
+        min_words = words_count.min()
+        avg_words = words_count.mean()
+        total_words = words_count.sum()
+
+        summary.append({
+            'language': lang,
+            'max_words/sentence': max_words,
+            'min_words/sentence': min_words,
+            'avg_words/sentence': avg_words,
+            'total_words_in_doc': total_words,
+        })
+
+    return pd.DataFrame(summary)
 
 
 def clean_data_with_count(files_path: str) -> pd.DataFrame:
     """ Build a clean dataset with a new column contains sentence length.
 
       Args:
-          files_path (str): A path to folder where the language files are located.
+        files_path (str): A path to folder where the language files are located.
 
       Returns:
-          A data frame contains sentences including its length.
+        A data frame contains sentences including its length.
       """
     clean_data = preprocessed_data(files_path)
     clean_data['sentence_length'] = clean_data['sentence'].apply(

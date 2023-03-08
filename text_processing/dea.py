@@ -13,7 +13,7 @@ from typing import Callable
 
 
 def count_sentences(data: pd.DataFrame) -> list:
-    """ Counts each sentence length for each language.
+    """ Counts each sentence chars length for each language.
 
     Args:
         data (DataFrame): A DataFrame contained the preprocessed data.
@@ -26,7 +26,7 @@ def count_sentences(data: pd.DataFrame) -> list:
     languages = data['language'].unique()
     all_language_scores = []
     for language in languages:
-        language_data = data.loc[lambda x: x['language'] == language]
+        language_data = data[data['language'] == language]
         score_sentences = [len(s) for s in language_data['sentence']]
         all_language_scores.append(score_sentences)
 
@@ -47,9 +47,9 @@ def display_data_in_bar(data: pd.DataFrame) -> None:
     counts.plot(kind='bar')
     for i, count in enumerate(counts):
         plt.text(i, count+0.5, str(count), ha='center', va='bottom')
-    plt.title("Language Counts")
+    plt.title("Total of sentences per language")
     plt.xlabel("Language")
-    plt.ylabel("Total (sentence)")
+    plt.ylabel("Total")
     plt.show()
 
 
@@ -69,9 +69,9 @@ def display_data_in_boxplot(data: pd.DataFrame) -> None:
     fig, ax = plt.subplots()
     ax.boxplot(count_sentences(data))
     ax.set_xticklabels(languages)
-    plt.title("Sentence length by language")
+    plt.title("Sentences distribution by language")
     plt.xlabel('Languages')
-    plt.ylabel('Sentence length')
+    plt.ylabel('Length (sentences)')
     plt.show()
 
 
