@@ -9,7 +9,11 @@ from sklearn.model_selection import train_test_split
 from typing import Callable
 
 
-def train_dev_test_split(dataset: pd.DataFrame, test_size_1: float, test_size_2: float) -> pd.Series:
+def train_dev_test_split(
+    dataset: pd.DataFrame,
+    test_size_1: float,
+    test_size_2: float
+) -> pd.Series:
     """ split data into train, development(dev)/validation and test sets.
 
     Args:
@@ -37,8 +41,8 @@ def train_dev_test_split(dataset: pd.DataFrame, test_size_1: float, test_size_2:
 def train_model(
         convert_features: Callable,
         model_settings: Callable,
-        x_train: list,
-        y_train: list
+        x_train: pd.Series,
+        y_train: pd.Series
 ) -> object:
     """ Transform the text into vector features and fit into model.
 
