@@ -79,8 +79,9 @@ def compile_all_data(files_path: str) -> pd.DataFrame:
       Returns:
           A data frame contains sentences with the respective language.
       """
-    tet, pt, en, id = split_to_sentences(files_path)
-    all_data = tet + pt + en + id
+    tet_sentences, pt_sentences, en_sentences, id_sentences = split_to_sentences(
+        files_path)
+    all_data = tet_sentences + pt_sentences + en_sentences + id_sentences
     dataset = pd.DataFrame(all_data, columns=['sentence', 'language'])
     dataset.reset_index(drop=True, inplace=True)
 
