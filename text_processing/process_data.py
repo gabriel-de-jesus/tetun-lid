@@ -5,12 +5,6 @@ import pandas as pd
 from text_processing.dea import count_sentences
 
 
-# User-defined list of punctuations
-PUNCTUATIONS = ['!', '"', '“', '”', '#', '$', '&', '(', ')', '*', '+',
-                ',', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[',
-                '\\', ']', '^', '`', '{', '|', '}', '~', '-']
-
-
 def load_corpus(file_path: str) -> str:
     """ Load and read text corpus.
 
@@ -21,7 +15,8 @@ def load_corpus(file_path: str) -> str:
       A string text corpus.
     """
     with open(file_path, 'r', encoding='utf-8') as file:
-        text_corpus = file.read()
+        lines = file.readlines()
+        text_corpus = ''.join(lines)
 
     return text_corpus
 
@@ -101,14 +96,20 @@ def preprocessed_data(files_path: str) -> pd.DataFrame:
       Returns:
           A data frame contains sentences with the respective language.
       """
-    punctutation_regex = r"[" + re.escape("".join(PUNCTUATIONS)) + "]"
+    punctuation = '!\"“”#$€&()*+,./–:;<=>?@%[\\]^_`{|}~'
+    punctutation_regex = r"[" + re.escape("".join(punctuation)) + "]"
     digit_regex = r"\d+"
+    three_dots = r"[…]+"
+    hyphen_with_spaces = r"\s*-\s+"
 
     data = compile_all_data(files_path)
     data.drop_duplicates(subset='sentence', keep=False, inplace=True)
     data['sentence'] = data['sentence'].str.lower()
     data['sentence'] = data['sentence'].str.replace(digit_regex, "")
     data['sentence'] = data['sentence'].str.replace(punctutation_regex, "")
+    data['sentence'] = data['sentence'].str.replace(three_dots, "")
+    data['sentence'] = data['sentence'].str.replace(hyphen_with_spaces, " ")
+
     data.reset_index(drop=True, inplace=True)
 
     clean_data = data[data['sentence'] != '']
@@ -166,7 +167,7 @@ def final_clean_data(data: pd.DataFrame) -> pd.DataFrame:
       """
     sentences_not_outliers = removed_sentence_outliers(data)
 
-    # Extract sentence_length from the sentences_not_outlier
+    # Extract sentence_length from the sentences_not_outliers
     values_to_keep = []
     for sentence_not_outlier in sentences_not_outliers:
         for per_language_value in sentence_not_outlier:
@@ -174,7 +175,7 @@ def final_clean_data(data: pd.DataFrame) -> pd.DataFrame:
 
     # Create a data frame with only the values that are in the sentences_not_outliers
     final_clean_data = data[data['sentence_length'].isin(values_to_keep)]
-    # Remove the sentence_length column
+    # Drop the sentence_length column
     final_clean_dataset = final_clean_data.drop('sentence_length', axis=1)
 
     return final_clean_dataset
