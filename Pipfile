@@ -11,6 +11,7 @@ matplotlib = "*"
 scikit-learn = "*"
 seaborn = "*"
 unidecode = "*"
+tensorflow = "*"
 
 [dev-packages]
 ipykernel = "*"

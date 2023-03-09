@@ -47,24 +47,59 @@ def train_model(
     """ Transform the text into vector features and fit into model.
 
     Args:
-        convert_features (function): A function to transform text to vector features.
-        model_settings (function): A ML model with optional parameters.
+        convert_features (callable): A function to transform text to vector features.
+        model_settings (callable): A ML model with optional parameters.
         x_train (series): A X_train proportional data using to train the model.
         y_train (series): A y_train proportional contains corresponding label of each line of train dataset.
 
     Returns:
         A model resulting from the training.
     """
-    # define pipeline
+
     model = Pipeline([
         ('features_conv', convert_features),
         ('model_name', model_settings)
     ])
 
-    # fit the model on the training data
     model.fit(x_train, y_train)
 
     return model
+
+
+def compare_models(
+        model_lists: list,
+        analyzers: list,
+        n_initial,
+        n_final,
+        step,
+        x_tr: pd.Series,
+        y_tr: pd.Series,
+        x_dv: pd.Series,
+        y_dv: pd.Series
+) -> None:
+    """ Feed various models, train and evaluate with validation data to compare their performance.
+
+    Args:
+        model_lists (list): a list of models to be compared.
+        analyzers (list): a list of analyzers (see n_gram_range of TfidfVectorizer in sklearn) to be compared.
+        n_initial (int): initial ngram.
+        n_final + 1 (int): final ngram to be trained and compared.
+        step (int): step between ngrams.
+        x_tr (series): X_train.
+        y_tr (series): y_train.
+        X_dv (series): X_dev.
+        y_dv (series): X_dev.
+    """
+    for model_list in model_lists:
+        print(f"Model: {model_list}")
+        for analyzer in analyzers:
+            print(f"Analyzer: {analyzer}")
+            for n in range(n_initial, n_final+1, step):
+                model_trial = train_model(TfidfVectorizer(
+                    analyzer=analyzer, ngram_range=(n, n)), model_list, x_tr, y_tr)
+                y_pred = model_trial.predict(x_dv)
+                accuracy = accuracy_score(y_dv, y_pred)
+                print(f"\tn_gram {n} --> accuracy: {accuracy: .4f}")
 
 
 def evaluate_model(model: object, x: pd.Series, y: pd.Series) -> None:
