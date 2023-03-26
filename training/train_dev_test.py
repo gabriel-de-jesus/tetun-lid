@@ -14,15 +14,13 @@ def train_dev_test_split(
     test_size_1: float,
     test_size_2: float
 ) -> pd.Series:
-    """ split data into train, development(dev)/validation and test sets.
+    """
+    Split data into train, development(dev)/validation and test sets.
 
-    Args:
-        dataset (DataFrame): A DataFrame contained the preprocessed data.
-        test_size_1 (float): the test size proportion between train and (dev+test).
-        test_size_2 (float): the test size proportion between dev and test.
-
-    Returns:
-        The proportion of  X(train, dev, test) and the corresponding y sets.
+    :param dataset: a DataFrame contained the preprocessed data.
+    :param test_size_1: the test size proportion between train and (dev+test).
+    :param test_size_2: the test size proportion between dev and test.
+    :return: the proportion of  X(train, dev, test) and the corresponding y sets.
     """
     corpus = dataset['sentence']
     labels = dataset['language']
@@ -44,16 +42,14 @@ def train_model(
         x_train: pd.Series,
         y_train: pd.Series
 ) -> object:
-    """ Transform the text into vector features and fit into model.
+    """ 
+    Transform the text into vector features and fit into model.
 
-    Args:
-        convert_features (callable): A function to transform text to vector features.
-        model_settings (callable): A ML model with optional parameters.
-        x_train (series): A X_train proportional data using to train the model.
-        y_train (series): A y_train proportional contains corresponding label of each line of train dataset.
-
-    Returns:
-        A model resulting from the training.
+    :param convert_features: A function to transform text to vector features.
+    :param model_settings: A ML model with optional parameters.
+    :param x_train: A X_train examples proportional data using to train the model.
+    :param y_train: A y_train examples proportional contains corresponding label of each line of train dataset.
+    :return: a model resulting from the training.
     """
 
     model = Pipeline([
@@ -77,18 +73,18 @@ def compare_models(
         x_dv: pd.Series,
         y_dv: pd.Series
 ) -> None:
-    """ Feed various models, train and evaluate with validation data to compare their performance.
+    """ 
+    Feed various models, train and evaluate with validation data to compare their performance.
 
-    Args:
-        model_lists (list): a list of models to be compared.
-        analyzers (list): a list of analyzers (see n_gram_range of TfidfVectorizer in sklearn) to be compared.
-        n_initial (int): initial ngram.
-        n_final + 1 (int): final ngram to be trained and compared.
-        step (int): step between ngrams.
-        x_tr (series): X_train.
-        y_tr (series): y_train.
-        X_dv (series): X_dev.
-        y_dv (series): X_dev.
+    :param model_lists: a list of models to be compared.
+    :param analyzers: a list of analyzers (see n_gram_range of TfidfVectorizer in sklearn) to be compared.
+    :param n_initial: initial ngram.
+    :param n_final + 1: final ngram to be trained and compared.
+    :param step: step between ngrams.
+    :param x_tr: X_train examples.
+    :param y_tr: y_train examples.
+    :param X_dv: X_dev examples.
+    :param y_dv: X_dev examples.
     """
     for model_list in model_lists:
         print(f"Model: {model_list}")
@@ -103,11 +99,11 @@ def compare_models(
 
 
 def evaluate_model(model: object, x: pd.Series, y: pd.Series) -> None:
-    """ Evaluate the model on development/validation or test sets.
+    """
+    Evaluate the model on development/validation or test sets.
 
-    Args:
-        x (series): A X_dev or X_test proportional data using to evaluate the model.
-        y (series): A y_dev or y_text proportional contains corresponding label of each line of dev dataset.
+    :param x: a X_dev or X_test proportional data using to evaluate the model.
+    :param y: A y_dev or y_text proportional contains corresponding label of each line of dev dataset.
     """
     y_pred = model.predict(x)
 

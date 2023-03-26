@@ -5,11 +5,11 @@ from bs4 import BeautifulSoup as bs
 
 
 def load_tetun_csv_data(csv_file_name: str, target_file: str) -> None:
-    """ Load Tetun dataset from csv file, clean the HTML tags, & save them to text file.
+    """
+    Load Tetun dataset from csv file, clean the HTML tags, & save them to text file.
 
-    Args:
-        csv_file_name (str): a file in csv format.
-        target_file (str): a string text file name (or path) to save the output text.
+    :param csv_file_name: a file in csv format.
+    :param target_file: a string text file name (or path) to save the output text.
     """
     tetun_corpus = pd.read_csv(csv_file_name)
     clean_corpus = []
@@ -24,11 +24,11 @@ def load_tetun_csv_data(csv_file_name: str, target_file: str) -> None:
 
 
 def load_other_languages_corpus(file_name: str, target_file: str) -> None:
-    """ Load EN, PT and ID compressed files in XZ format and save them to text file.
+    """ 
+    Load EN, PT and ID compressed files in XZ format and save them to text file.
 
-    Args:
-        file_name (str): a list of file names.
-        target_file (str): a string text file name (or path) to save the output text.
+    :param file_name: a list of file names.
+    :param target_file: a string text file name (or path) to save the output text.
     """
     with lzma.open(file_name, 'rb') as f:
         # The size is set in accordance with the size of Tetun text
