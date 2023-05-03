@@ -1,104 +1,96 @@
 import os
-import pandas as pd
 import numpy as np
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.mixture import GaussianMixture
-from sklearn.cluster import KMeans, Birch, AgglomerativeClustering
 from typing import Callable, List
+from common_utils import config
+from .process_data import ProcessData
 
 
 class DataAnalysisExploration:
     """
-    A class for performing data analysis and exploration.
+    This class performs data analysis and exploration.
     """
 
-    def count_sentences(self, data: pd.DataFrame) -> List[int]:
-        """ Counts each sentence chars length for each language.
+    def __init__(self, dataset) -> None:
+        self.process_data = ProcessData()
+        self.dataset = dataset
+        self.plots = config.plots
+        self.data_frac_for_clustering = config.DATA_FRAC_FOR_CLUSTERING
 
-        Args:
-            data (DataFrame): A DataFrame contained the preprocessed data.
+    def count_sentences(self) -> List[int]:
+        """ Counts each sentence chars length for each language and return a list of integer. """
 
-        Returns:
-            A list contains list of Tetun (tet), Portuguese (pt), English (en),
-            and Indonesian (id) language
-        """
+        languages = list(set(self.dataset["language"]))
+        data = [
+            self.dataset[self.dataset["language"] == lang]["sentence_length"] for lang in languages
+        ]
 
-        languages = list(set(data['language']))
-        all_language_scores = []
-        for language in languages:
-            language_data = data[data['language'] == language]
-            score_sentences = [len(s) for s in language_data['sentence']]
-            all_language_scores.append(score_sentences)
+        return data
 
-        return all_language_scores
+    def words_summary(self) -> pd.DataFrame:
+        """ Summarize sentence and words in each sentence, including the overall total, 
+        and return a DataFrame containing their summary. """
 
-    def display_data_in_bar(self, data: pd.DataFrame) -> None:
-        """ Visualize dataset in a bar plot.
+        summary = []
+        for lang in list(set(self.dataset["language"])):
+            sentence_list = self.dataset["sentence"][self.dataset["language"] == lang]
+            words = sentence_list.str.split()
+            words_count = words.apply(len)
+            max_words_per_sentence = words_count.max()
+            min_words_per_sentence = words_count.min()
+            avg_words_per_sentence = words_count.mean()
+            total_words_in_doc = words_count.sum()
 
-        Args:
-            data (DataFrame): a DataFrame contained a preprocessed data.
+            summary.append(
+                {
+                    "language": lang,
+                    "max_words/sentence": max_words_per_sentence,
+                    "min_words/sentence": min_words_per_sentence,
+                    "avg_words/sentence": avg_words_per_sentence,
+                    "total_words_in_doc": total_words_in_doc,
+                }
+            )
 
-        Results:
-            A bar plot illustrates the total sentences for each language.
-        """
+        return pd.DataFrame(summary)
 
-        counts = data['language'].value_counts()
-        counts.plot(kind='bar')
+    def display_data_in_bar(self) -> None:
+        """ Visualize dataset in a bar plot. """
+
+        counts = self.dataset["language"].value_counts()
+        counts.plot(kind="bar")
         for i, count in enumerate(counts):
-            plt.text(i, count+0.5, str(count), ha='center', va='bottom')
+            plt.text(i, count + 0.5, str(count), ha="center", va="bottom")
         plt.title("Total of sentences per language")
         plt.xlabel("Language")
         plt.ylabel("Total")
         plt.show()
 
-    def display_data_in_boxplot(self, data: pd.DataFrame) -> None:
-        """ Visualize dataset for each language in boxplot.
+    def display_data_in_boxplot(self) -> None:
+        """ Visualize dataset for each language in boxplot and returns
+        a plot contains 4 boxplots, one for each language. """
 
-        Args:
-            data (DataFrame): a DataFrame contained a preprocessed data.
-
-        Results:
-            A plot contains 4 boxplots, one for each language
-        """
-
-        languages = list(set(data['language']))
-
-        # Plot in the boxplots
+        languages = list(set(self.dataset["language"]))
         fig, ax = plt.subplots()
-        ax.boxplot(self.count_sentences(data))
+        ax.boxplot(self.count_sentences())
         ax.set_xticklabels(languages)
         plt.title("Sentences distribution by language")
-        plt.xlabel('Languages')
-        plt.ylabel('Length (sentences)')
+        plt.xlabel("Languages")
+        plt.ylabel("Length (sentences)")
         plt.show()
 
-    def display_data_in_gaussian_dist(
-            self,
-            data: pd.DataFrame,
-            count_sentences: List[int] = count_sentences,
-            display_lines: bool = False
-    ) -> None:
+    def display_data_in_gaussian_dist(self, display_lines: bool = False) -> None:
         """ Counts each sentence length for each language.
-
-        Args:
-            data (DataFrame): a DataFrame contained a preprocessed data.
-            sentece_counts (list): a list of language lists.
-            display_lines (bool): whether displaying lines or not (default=False)
-
-        Results:
-            A plot contains 4 subplots, one for each language
+        :param display_lines (bool): whether displaying lines or not (default=False)
         """
 
-        # Get a list of the language
-        languages = list(set(data['language']))
-
-        # A list that contains lists of the sentences length for each language
-        data_counts = self.count_sentences(data)
+        languages = list(set(self.dataset["language"]))
+        data_counts = self.count_sentences()
 
         num_rows = 2
         num_cols = 2
@@ -111,8 +103,6 @@ class DataAnalysisExploration:
 
             # Outlier detection with the Standard Deviation Method
             cut_off_1 = np.std(data_counts[i]) * 1
-            # cut_off_2 = np.std(data_counts[i]) * 2
-            # cut_off_3 = np.std(data_counts[i]) * 3
             mean_value = np.mean(data_counts[i])
 
             # Outlier detection with the Inter-Quartil Method
@@ -125,14 +115,24 @@ class DataAnalysisExploration:
             # Plot the gaussian distribution
             sns.kdeplot(data_counts[i], shade=True, ax=ax)
             if display_lines:
-                ax.axvline(mean_value - cut_off_1, linestyle='dashed',
-                           color='green', label='lower boundary for std 1')
-                ax.axvline(mean_value + cut_off_1, linestyle='dashed',
-                           color='green', label='upper boundary for std 1')
-                ax.axvline(iqr - cut_off, linestyle='dashed',
-                           color='red', label='lower boundary for IQR 1')
-                ax.axvline(iqr + cut_off, linestyle='dashed',
-                           color='red', label='upper boundary for IQR 1')
+                ax.axvline(
+                    mean_value - cut_off_1,
+                    linestyle="dashed",
+                    color="green",
+                    label="lower boundary for std 1",
+                )
+                ax.axvline(
+                    mean_value + cut_off_1,
+                    linestyle="dashed",
+                    color="green",
+                    label="upper boundary for std 1",
+                )
+                ax.axvline(
+                    iqr - cut_off, linestyle="dashed", color="red", label="lower boundary for IQR 1"
+                )
+                ax.axvline(
+                    iqr + cut_off, linestyle="dashed", color="red", label="upper boundary for IQR 1"
+                )
                 ax.legend()
             ax.set_xlabel(languages[i])
             # ax.set_title("Sentence length distribution by language")
@@ -142,28 +142,27 @@ class DataAnalysisExploration:
         plt.show()
 
     def display_data_in_clustering(
-            self,
-            data: pd.DataFrame,
-            algorithm: Callable,
-            title: str,
-            num_clusters: int = 4,
-            using_random_state: bool = False,
-            using_n_components: bool = False
+        self,
+        algorithm: Callable,
+        title: str,
+        num_clusters: int = 4,
+        using_random_state: bool = False,
+        using_n_components: bool = False,
     ) -> None:
-        """ Visualize clustering of each language.
-
-        Args:
-            data (DataFrame): a DataFrame contained a preprocessed data.
-            algorithm: clustering algorithm name.
-            title (str): the graph title.
-            um_clusters (int): number of clusters (4 default).
-            num_components (bool): whether a n_components parameter is used (default=False).
-            random_state (bool): whether a random_state parameter is used (default=False).
-
-        Results:
-            A plot of 2 dimensional.
+        """ 
+        Visualize clustering of each language.
+        
+        :param algorithm: clustering algorithm name.
+        :paramtitle (str): the graph title.
+        :param num_clusters (int): number of clusters (4 default).
+        :param num_components (bool): whether a n_components parameter is used (default=False).
+        :param random_state (bool): whether a random_state parameter is used (default=False).
         """
-        input_sentences = data['sentence']
+
+        data = self.dataset.sample(
+            frac=self.data_frac_for_clustering, random_state=42
+        )  # Reduce the data size
+        input_sentences = data["sentence"]
 
         # Convert the text data into numerical vectors
         vectorizer = CountVectorizer()
@@ -178,10 +177,10 @@ class DataAnalysisExploration:
         norm_sentences = scaler.transform(sentences_pca)
 
         # Get unique labels
-        unique_labels = list(set(data['language']))
+        unique_labels = list(set(data["language"]))
 
         # Define a list of colors
-        colors = ['red', 'blue', 'green', 'orange']
+        colors = ["red", "blue", "green", "orange"]
 
         # Assign a color to each unique label
         label_color_dict = {}
@@ -193,17 +192,14 @@ class DataAnalysisExploration:
             algorithm(n_clusters=num_clusters).fit(norm_sentences)
         else:
             if using_n_components:
-                algorithm(n_components=num_clusters,
-                          random_state=42).fit(norm_sentences)
+                algorithm(n_components=num_clusters, random_state=42).fit(norm_sentences)
             else:
-                algorithm(n_clusters=num_clusters,
-                          random_state=42).fit(norm_sentences)
+                algorithm(n_clusters=num_clusters, random_state=42).fit(norm_sentences)
 
         # Plot the clusters found with different colors for each label
         fig, ax = plt.subplots(figsize=(8, 6))
-        for i, label in enumerate(data['language']):
-            ax.scatter(norm_sentences[i, 0], norm_sentences[i,
-                                                            1], color=label_color_dict[label])
+        for i, label in enumerate(data["language"]):
+            ax.scatter(norm_sentences[i, 0], norm_sentences[i, 1], color=label_color_dict[label])
 
         # Add legend
         legend_handles = []
@@ -213,28 +209,16 @@ class DataAnalysisExploration:
 
         ax.set_xlabel(title)
 
-        plt.savefig('plots/'+title.lower()+'.png')
+        plt.savefig(str(self.plots / (title.lower() + ".png")))
         plt.close(fig)
 
     def display_images(self, *args: str) -> None:
-        """Visualize images in a plot.
+        """ Visualize images in a plot. """
 
-        Args:
-            *args (str): image names (for 4 images).
-
-        Results:
-            A plot contains 4 plots, one for each image.
-        """
-        img_dir = "plots/"
-
-        img1 = Image.open(os.path.join(img_dir, args[0])) if len(
-            args) >= 1 else None
-        img2 = Image.open(os.path.join(img_dir, args[1])) if len(
-            args) >= 2 else None
-        img3 = Image.open(os.path.join(img_dir, args[2])) if len(
-            args) >= 3 else None
-        img4 = Image.open(os.path.join(img_dir, args[3])) if len(
-            args) >= 4 else None
+        img1 = Image.open(os.path.join(self.plots, args[0])) if len(args) >= 1 else None
+        img2 = Image.open(os.path.join(self.plots, args[1])) if len(args) >= 2 else None
+        img3 = Image.open(os.path.join(self.plots, args[2])) if len(args) >= 3 else None
+        img4 = Image.open(os.path.join(self.plots, args[3])) if len(args) >= 4 else None
 
         fig, axs = plt.subplots(2, 2, figsize=(16, 12))
         axs[0, 0].imshow(img1) if img1 else None

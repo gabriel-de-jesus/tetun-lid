@@ -1,0 +1,10 @@
+*.txt
+*.pkl
+plots/
+model_best/
+lang_files_origin/
+lang_files/
+.vscode
+Pipfile.lock
+__pycache__
+.ipynb_checkpoints
