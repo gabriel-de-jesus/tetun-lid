@@ -17,9 +17,12 @@ plots = Path("plots/")
 BITE_SIZE = 3834110
 DATA_FRAC_FOR_CLUSTERING = 0.03
 
-# Punctuations
-PUNCTUATION = '!"“”#$€&()*+,./–:;<=>?@%[\\]^_`{|}~\n'
-PUNCTUATION_REGEX = r"[" + re.escape("".join(PUNCTUATION)) + "]"
-DIGIT_REGEX = r"\d+"
+# Regualar expressions (regex)
+DIGITS_REGEX = r"\s+[\d]+(?:[\.\,][\d]*)?\s+" # E.g., 12.000.678,05 or 12,000,000.05
+PUNCTUATION_SYMBOLS = '!"“”(),./:;?[\\]^_`{|}#&§©®™°∞¶†‡$€£μ@*+÷%<=>«»~\n'
+PUNCTUATIONS_SYMBOLS_REGEX = r"[" + re.escape("".join(PUNCTUATION_SYMBOLS)) + "]"
 THREE_DOTS = r"[…]+"
-HYPHEN_WITH_SPACES = r"\s*-\s+"
+REMOVE_SPACE_AT_THE_BEGINNING = r"^\s*([a-z])" # Will be removed using r'\1'
+HYPHEN_WITH_SPACES = r"\s*–*-*\s+" # E.g., space-space, word-space
+INT_NUMBERS_REGEX = r"\b(?<!-)\d+\b" # E.g. 12, 150, 2000, etc, excluding na'in-56 or ema-2.
+ONE_OR_MORE_SPACES = r"\s+\s*" # Eg. space space -> will be replace with the one space

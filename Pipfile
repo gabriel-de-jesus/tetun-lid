@@ -12,6 +12,8 @@ scikit-learn = "*"
 seaborn = "*"
 unidecode = "*"
 tensorflow = "*"
+torch = "*"
+torchvision = "*"
 
 [dev-packages]
 ipykernel = "*"

@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -10,16 +11,23 @@ from tetuntokenizer.tokenizer import TetunSentenceTokenizer
 
 class ProcessData:
     """
-    This class performs data processing.
+    This class:
+    1. Load each of the language files from the lang_files folder.
+    2. Split into tokens using Tetun sentence tokenizer and map each sentence to the respective langID.
+    3. Store sentence - langID pairs in dataframe.
+    4. Preprocess sentences by removing punctuations, symbols, digits, etc.
     """
 
     def __init__(self) -> None:
         self.root_txt_files = config.root_txt_files
         self.tokenizer = TetunSentenceTokenizer()
-        self.punctutation_regex = config.PUNCTUATION_REGEX
-        self.digit_regex = config.DIGIT_REGEX
+        self.punctutations_symbols_regex = config.PUNCTUATIONS_SYMBOLS_REGEX
+        self.digits_regex = config.DIGITS_REGEX
+        self.int_numbers_regex = config.INT_NUMBERS_REGEX
         self.three_dots = config.THREE_DOTS
         self.hyphen_with_spaces = config.HYPHEN_WITH_SPACES
+        self.one_or_more_spaces = config.ONE_OR_MORE_SPACES
+        self.remove_space_at_the_beginning = config.REMOVE_SPACE_AT_THE_BEGINNING
 
     def list_of_input_text_files(self) -> List[str]:
         """ Get lists of the input text files and return a list of their corresponding file names. """
@@ -64,41 +72,49 @@ class ProcessData:
 
         return dataset
 
-    def preprocessed_data(self) -> pd.DataFrame:
+    def preprocess_dataset(self) -> pd.DataFrame:
         """ 
         Build a clean dataset for all the languages by removing:
-        1. Punctuations.
-        2. Three dots, i.e., "...".
-        3. Hypens with space(s), e.g., "- " or " - ".
+        1. Digits.
+        2. Punctuations.
+        3. Three dots, i.e., "...".
+        4. Hypens with space(s), e.g., "- " or " - ".
+        5. Space at the beginning of the sentence.
+        6. Integer values resulting from (2), i.e., in (1) digits like 12/01 are not removed, and in (2) it becomes 12 02.
+        7. Replace one or more consecutive spaces with one only space.
         and then return them in a dataframe 
         """
 
         data = self.save_text_data_into_dataframe()
         data.drop_duplicates(subset="sentence", keep=False, inplace=True)
-        data["sentence"] = data["sentence"].str.lower()
-        data["sentence"] = data["sentence"].str.replace(self.digit_regex, "")
-        data["sentence"] = data["sentence"].str.replace(self.punctutation_regex, "")
-        data["sentence"] = data["sentence"].str.replace(self.three_dots, "")
-        data["sentence"] = data["sentence"].str.replace(self.hyphen_with_spaces, " ")
-
+        
+        data['sentence'] = data['sentence'].str.lower()
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.digits_regex, " ", x)) # E.g. 12.000.000,05 or 12,000,000.05
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.punctutations_symbols_regex, " ", x)) # For the numbers, e.g., 12/03 becomes 12 03
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.three_dots, "", x))
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.hyphen_with_spaces, " ", x))
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.remove_space_at_the_beginning, r'\1', x))
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.int_numbers_regex, " ", x)) # Remove integer digits, e.g., 12 03 
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.one_or_more_spaces, " ", x))
+        data.loc[data['sentence'].str.len() < 10, 'sentence'] = ""
+        
         data.reset_index(drop=True, inplace=True)
         clean_data = data[(data["sentence"] != "") & (data["sentence"] != " ")]
-
         return clean_data
 
-    def initial_clean_data_with_count(self) -> pd.DataFrame:
+    def preprocess_dataset_with_count(self) -> pd.DataFrame:
         """ Add one new column for the sentence length to the preprocessed dataframe. """
 
-        clean_data = self.preprocessed_data()
+        clean_data = self.preprocess_dataset()
         clean_data["sentence_length"] = clean_data["sentence"].apply(len)
 
         return clean_data
 
-    def removed_sentence_outliers(self) -> List[str]:
+    def remove_outliers_data(self) -> List[str]:
         """ Remove outliers (longest or shortest sentences) and return a list contains lists of 
         sentences with the respective length """
 
-        clean_data = self.initial_clean_data_with_count()
+        clean_data = self.preprocess_dataset_with_count()
         data_counts = clean_data["sentence_length"]
         outlier_removed = []
 
@@ -114,12 +130,12 @@ class ProcessData:
 
         return outlier_removed
 
-    def final_clean_data(self) -> pd.DataFrame:
+    def normalize_dataset(self) -> pd.DataFrame:
         """ Build a final clean dataset and return a dataframe contains sentences excluding outliers. """
 
-        data = self.initial_clean_data_with_count()
-        sentences_not_outliers = self.removed_sentence_outliers()
-        # Create a dataframe with only the values that are in the sentences_not_outliers
+        data = self.preprocess_dataset_with_count()
+        sentences_not_outliers = self.remove_outliers_data()
+        # Create a dataframe with only the values that are in the normalize_sentences
         final_clean_dataset = data[data["sentence_length"].isin(sentences_not_outliers)]
 
         return final_clean_dataset

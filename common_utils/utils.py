@@ -1,5 +1,6 @@
 import pandas as pd
 import lzma
+from unidecode import unidecode
 from pathlib import Path
 from bs4 import BeautifulSoup as bs
 

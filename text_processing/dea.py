@@ -101,11 +101,11 @@ class DataAnalysisExploration:
             col = i % num_cols
             ax = axes[row, col]
 
-            # Outlier detection with the Standard Deviation Method
+            # Outlier detection using the Standard Deviation Method
             cut_off_1 = np.std(data_counts[i]) * 1
             mean_value = np.mean(data_counts[i])
 
-            # Outlier detection with the Inter-Quartil Method
+            # Outlier detection wusingith the Inter-Quartile Method
             q25 = np.percentile(data_counts[i], 25)
             q75 = np.percentile(data_counts[i], 75)
             iqr = q75 - q25
@@ -176,10 +176,7 @@ class DataAnalysisExploration:
         scaler = StandardScaler().fit(sentences_pca)
         norm_sentences = scaler.transform(sentences_pca)
 
-        # Get unique labels
         unique_labels = list(set(data["language"]))
-
-        # Define a list of colors
         colors = ["red", "blue", "green", "orange"]
 
         # Assign a color to each unique label
