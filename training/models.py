@@ -93,7 +93,6 @@ class TrainModels:
         """
 
         model = Pipeline([("features_conv", convert_features), ("model_name", model_settings)])
-
         model.fit(x_train, y_train)
 
         return model

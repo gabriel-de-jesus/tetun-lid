@@ -101,11 +101,11 @@ class DataAnalysisExploration:
             col = i % num_cols
             ax = axes[row, col]
 
-            # Outlier detection using the Standard Deviation Method
+            # Outlier detection using the Standard Deviation Method.
             cut_off_1 = np.std(data_counts[i]) * 1
             mean_value = np.mean(data_counts[i])
 
-            # Outlier detection wusingith the Inter-Quartile Method
+            # Outlier detection wusingith the Inter-Quartile Method.
             q25 = np.percentile(data_counts[i], 25)
             q75 = np.percentile(data_counts[i], 75)
             iqr = q75 - q25
@@ -161,30 +161,27 @@ class DataAnalysisExploration:
 
         data = self.dataset.sample(
             frac=self.data_frac_for_clustering, random_state=42
-        )  # Reduce the data size
+        )  # Reduce the data size.
         input_sentences = data["sentence"]
 
-        # Convert the text data into numerical vectors
+        # Convert the text data into numerical vectors.
         vectorizer = CountVectorizer()
         sentences = vectorizer.fit_transform(input_sentences)
 
-        # Reduce data dimensionality to 2 dimensions
+        # Reduce data dimensionality to 2 dimensions and normalize sentence length.
         pca = PCA(n_components=2)
         sentences_pca = pca.fit_transform(sentences.toarray())
-
-        # Normalize the sentence length
         scaler = StandardScaler().fit(sentences_pca)
         norm_sentences = scaler.transform(sentences_pca)
 
         unique_labels = list(set(data["language"]))
         colors = ["red", "blue", "green", "orange"]
 
-        # Assign a color to each unique label
         label_color_dict = {}
         for i, label in enumerate(unique_labels):
             label_color_dict[label] = colors[i % len(colors)]
 
-        # Apply clustering algorithm with k=4
+        # Apply clustering algorithms.
         if not using_random_state:
             algorithm(n_clusters=num_clusters).fit(norm_sentences)
         else:
@@ -193,17 +190,15 @@ class DataAnalysisExploration:
             else:
                 algorithm(n_clusters=num_clusters, random_state=42).fit(norm_sentences)
 
-        # Plot the clusters found with different colors for each label
+        # Plot the clusters found with different colors for each label.
         fig, ax = plt.subplots(figsize=(8, 6))
         for i, label in enumerate(data["language"]):
             ax.scatter(norm_sentences[i, 0], norm_sentences[i, 1], color=label_color_dict[label])
 
-        # Add legend
         legend_handles = []
         for label, color in label_color_dict.items():
             legend_handles.append(ax.scatter([], [], color=color, label=label))
         ax.legend(handles=legend_handles)
-
         ax.set_xlabel(title)
 
         plt.savefig(str(self.plots / (title.lower() + ".png")))

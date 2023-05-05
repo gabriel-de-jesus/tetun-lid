@@ -89,12 +89,12 @@ class ProcessData:
         data.drop_duplicates(subset="sentence", keep=False, inplace=True)
         
         data['sentence'] = data['sentence'].str.lower()
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.digits_regex, " ", x)) # E.g. 12.000.000,05 or 12,000,000.05
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.punctutations_symbols_regex, " ", x)) # For the numbers, e.g., 12/03 becomes 12 03
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.digits_regex, " ", x)) # E.g. 12.000.000,05 or 12,000,000.05.
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.punctutations_symbols_regex, " ", x)) # For the numbers, e.g., 12/03 becomes 12 03.
         data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.three_dots, "", x))
         data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.hyphen_with_spaces, " ", x))
         data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.remove_space_at_the_beginning, r'\1', x))
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.int_numbers_regex, " ", x)) # Remove integer digits, e.g., 12 03 
+        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.int_numbers_regex, " ", x)) # Remove integer digits, e.g., 12 03.
         data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.one_or_more_spaces, " ", x))
         data.loc[data['sentence'].str.len() < 10, 'sentence'] = ""
         
