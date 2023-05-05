@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup as bs
 
 
 class Utils:
-    """ This class contains functions for parsing and reading files """
+    """ This class contains functions for parsing and reading files. """
 
     def __init__(self, origin_file_path: Path, target_file_path: Path = None) -> None:
         self.origin_file_path = origin_file_path
@@ -34,7 +34,7 @@ class Utils:
 
         try:
             with lzma.open(self.origin_file_path, "rb") as f:
-                # The size is set in accordance with the size of the Tetun text
+                # The size is set in accordance with the size of the Tetun text.
                 contents = f.read(byte_size).decode("utf-8")
 
         except FileNotFoundError as e:
