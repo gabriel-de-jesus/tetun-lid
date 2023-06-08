@@ -14,6 +14,7 @@ unidecode = "*"
 tensorflow = "*"
 torch = "*"
 torchvision = "*"
+tetun-tokenizer = "*"
 
 [dev-packages]
 ipykernel = "*"

@@ -13,7 +13,7 @@ class Utils:
         self.target_file_path = target_file_path
 
     def parse_tetun_corpus(self) -> None:
-        """ Load Tetun dataset from csv file, clean the HTML tags, and save them in a text file. """
+        """ Load Tetun dataset from csv file, clean the HTML tags, and save in a text file. """
 
         try:
             tetun_corpus = pd.read_csv(self.origin_file_path)

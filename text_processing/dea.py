@@ -24,7 +24,7 @@ class DataAnalysisExploration:
         self.data_frac_for_clustering = config.DATA_FRAC_FOR_CLUSTERING
 
     def count_sentences(self) -> List[int]:
-        """ Counts each sentence chars length for each language and return a list of integer. """
+        """ Counts each sentence length for each language and return a list of integer. """
 
         languages = list(set(self.dataset["language"]))
         data = [
@@ -42,17 +42,17 @@ class DataAnalysisExploration:
             sentence_list = self.dataset["sentence"][self.dataset["language"] == lang]
             words = sentence_list.str.split()
             words_count = words.apply(len)
-            max_words_per_sentence = words_count.max()
-            min_words_per_sentence = words_count.min()
-            avg_words_per_sentence = words_count.mean()
+            max_words_per_documents = words_count.max()
+            min_words_per_documents = words_count.min()
+            avg_words_per_documents = words_count.mean()
             total_words_in_doc = words_count.sum()
 
             summary.append(
                 {
                     "language": lang,
-                    "max_words/sentence": max_words_per_sentence,
-                    "min_words/sentence": min_words_per_sentence,
-                    "avg_words/sentence": avg_words_per_sentence,
+                    "max_words/documents": max_words_per_documents,
+                    "min_words/documents": min_words_per_documents,
+                    "avg_words/documents": avg_words_per_documents,
                     "total_words_in_doc": total_words_in_doc,
                 }
             )
@@ -151,7 +151,7 @@ class DataAnalysisExploration:
     ) -> None:
         """ 
         Visualize clustering of each language.
-        
+
         :param algorithm: clustering algorithm name.
         :paramtitle (str): the graph title.
         :param num_clusters (int): number of clusters (4 default).
@@ -186,14 +186,17 @@ class DataAnalysisExploration:
             algorithm(n_clusters=num_clusters).fit(norm_sentences)
         else:
             if using_n_components:
-                algorithm(n_components=num_clusters, random_state=42).fit(norm_sentences)
+                algorithm(n_components=num_clusters,
+                          random_state=42).fit(norm_sentences)
             else:
-                algorithm(n_clusters=num_clusters, random_state=42).fit(norm_sentences)
+                algorithm(n_clusters=num_clusters,
+                          random_state=42).fit(norm_sentences)
 
         # Plot the clusters found with different colors for each label.
         fig, ax = plt.subplots(figsize=(8, 6))
         for i, label in enumerate(data["language"]):
-            ax.scatter(norm_sentences[i, 0], norm_sentences[i, 1], color=label_color_dict[label])
+            ax.scatter(
+                norm_sentences[i, 0], norm_sentences[i, 1], color=label_color_dict[label])
 
         legend_handles = []
         for label, color in label_color_dict.items():
@@ -207,10 +210,14 @@ class DataAnalysisExploration:
     def display_images(self, *args: str) -> None:
         """ Visualize images in a plot. """
 
-        img1 = Image.open(os.path.join(self.plots, args[0])) if len(args) >= 1 else None
-        img2 = Image.open(os.path.join(self.plots, args[1])) if len(args) >= 2 else None
-        img3 = Image.open(os.path.join(self.plots, args[2])) if len(args) >= 3 else None
-        img4 = Image.open(os.path.join(self.plots, args[3])) if len(args) >= 4 else None
+        img1 = Image.open(os.path.join(self.plots, args[0])) if len(
+            args) >= 1 else None
+        img2 = Image.open(os.path.join(self.plots, args[1])) if len(
+            args) >= 2 else None
+        img3 = Image.open(os.path.join(self.plots, args[2])) if len(
+            args) >= 3 else None
+        img4 = Image.open(os.path.join(self.plots, args[3])) if len(
+            args) >= 4 else None
 
         fig, axs = plt.subplots(2, 2, figsize=(16, 12))
         axs[0, 0].imshow(img1) if img1 else None

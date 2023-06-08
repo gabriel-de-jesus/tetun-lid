@@ -1,7 +1,7 @@
 plots/
 model_best/
-lang_files_origin/
 lang_files/
+lang_files_origin/
 .vscode
 Pipfile.lock
 __pycache__

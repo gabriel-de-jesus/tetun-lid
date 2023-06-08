@@ -14,7 +14,7 @@ class TrainModels:
 
     def train_dev_test_split(self, test_size_1: float, test_size_2: float) -> pd.Series:
         """
-        Split data into train, development(dev)/validation and test sets.
+        Split dataset into train, development(dev)/validation and test sets.
 
         :param test_size_1: the test size proportion between train and (dev+test).
         :param test_size_2: the test size proportion between dev and test.
@@ -92,7 +92,8 @@ class TrainModels:
         :return: a model resulting from the training.
         """
 
-        model = Pipeline([("features_conv", convert_features), ("model_name", model_settings)])
+        model = Pipeline([("features_conv", convert_features),
+                         ("model_name", model_settings)])
         model.fit(x_train, y_train)
 
         return model
@@ -108,4 +109,5 @@ class TrainModels:
 
         print("Accuracy: ", accuracy_score(target_y, target_y_pred))
         print("Confusion Matrix: ", confusion_matrix(target_y, target_y_pred))
-        print("Classification Report: ", classification_report(target_y, target_y_pred, digits=5))
+        print("Classification Report: ", classification_report(
+            target_y, target_y_pred, digits=5))

@@ -3,6 +3,8 @@ from common_utils import config
 
 
 class ParseData:
+    """Class to parse the dataset of Tetun and other languages. """
+
     def __init__(self) -> None:
         self.tet_csv_file_path = config.tet_csv
         self.pt_lzma_file_path = config.pt_lzma
