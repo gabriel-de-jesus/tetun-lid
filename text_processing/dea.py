@@ -11,6 +11,12 @@ from typing import Callable, List
 from common_utils import config
 from .process_data import ProcessData
 
+# !/text_processing/
+#
+# dea.py
+# Gabriel de Jesus (mestregabrieldejesus@gmail.com)
+# 15-04-2023
+
 
 class DataAnalysisExploration:
     """
@@ -162,17 +168,17 @@ class DataAnalysisExploration:
         data = self.dataset.sample(
             frac=self.data_frac_for_clustering, random_state=42
         )  # Reduce the data size.
-        input_sentences = data["sentence"]
+        input_tokens = data["token"]
 
         # Convert the text data into numerical vectors.
         vectorizer = CountVectorizer()
-        sentences = vectorizer.fit_transform(input_sentences)
+        words = vectorizer.fit_transform(input_tokens)
 
         # Reduce data dimensionality to 2 dimensions and normalize sentence length.
         pca = PCA(n_components=2)
-        sentences_pca = pca.fit_transform(sentences.toarray())
-        scaler = StandardScaler().fit(sentences_pca)
-        norm_sentences = scaler.transform(sentences_pca)
+        words_pca = pca.fit_transform(words.toarray())
+        scaler = StandardScaler()
+        norm_words = scaler.fit_transform(words_pca)
 
         unique_labels = list(set(data["language"]))
         colors = ["red", "blue", "green", "orange"]
@@ -183,20 +189,20 @@ class DataAnalysisExploration:
 
         # Apply clustering algorithms.
         if not using_random_state:
-            algorithm(n_clusters=num_clusters).fit(norm_sentences)
+            algorithm(n_clusters=num_clusters).fit(norm_words)
         else:
             if using_n_components:
                 algorithm(n_components=num_clusters,
-                          random_state=42).fit(norm_sentences)
+                          random_state=42).fit(norm_words)
             else:
                 algorithm(n_clusters=num_clusters,
-                          random_state=42).fit(norm_sentences)
+                          random_state=42).fit(norm_words)
 
         # Plot the clusters found with different colors for each label.
         fig, ax = plt.subplots(figsize=(8, 6))
         for i, label in enumerate(data["language"]):
             ax.scatter(
-                norm_sentences[i, 0], norm_sentences[i, 1], color=label_color_dict[label])
+                norm_words[i, 0], norm_words[i, 1], color=label_color_dict[label])
 
         legend_handles = []
         for label, color in label_color_dict.items():

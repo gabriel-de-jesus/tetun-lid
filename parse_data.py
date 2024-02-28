@@ -1,6 +1,12 @@
 from common_utils.utils import Utils
 from common_utils import config
 
+# !/
+#
+# parse_data.py
+# Gabriel de Jesus (mestregabrieldejesus@gmail.com)
+# 01-03-2023
+
 
 class ParseData:
     """Class to parse the dataset of Tetun and other languages. """

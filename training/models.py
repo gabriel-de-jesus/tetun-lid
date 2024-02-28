@@ -5,6 +5,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from typing import Callable
 
+# !/training/
+#
+# models.py
+# Gabriel de Jesus (mestregabrieldejesus@gmail.com)
+# 26-05-2023
+
 
 class TrainModels:
     """ Train and compare several classical Machine Learning models. """

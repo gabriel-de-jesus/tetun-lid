@@ -6,7 +6,13 @@ from pathlib import Path
 from typing import List, Tuple
 from common_utils.utils import Utils
 from common_utils import config
-from tetuntokenizer.tokenizer import TetunSentenceTokenizer
+from tetuntokenizer.tokenizer import TetunSentenceTokenizer, TetunWordTokenizer
+
+# !/text_processing/
+#
+# process_data.py
+# Gabriel de Jesus (mestregabrieldejesus@gmail.com)
+# 05-04-2023
 
 
 class ProcessData:
@@ -20,7 +26,8 @@ class ProcessData:
 
     def __init__(self) -> None:
         self.root_txt_files = config.root_txt_files
-        self.tokenizer = TetunSentenceTokenizer()
+        self.sentence_tokenizer = TetunSentenceTokenizer()
+        self.word_tokenizer = TetunWordTokenizer()
         self.punctutations_symbols_regex = config.PUNCTUATIONS_SYMBOLS_REGEX
         self.digits_regex = config.DIGITS_REGEX
         self.int_numbers_regex = config.INT_NUMBERS_REGEX
@@ -49,12 +56,13 @@ class ProcessData:
             corpus = Utils(path).load_corpus()
 
             # tokenize by sentence
-            sentences_list = self.tokenizer.tokenize(corpus)
+            sentences_list = self.sentence_tokenizer.tokenize(corpus)
             sentences_list = [s.strip() for s in sentences_list]
 
             # Pair langcode with each sentence
             lang_code = lang_file.split(".")[0]
-            sentences_list = [(s, lang_code) for s in sentences_list if len(s) > 0]
+            sentences_list = [(s, lang_code)
+                              for s in sentences_list if len(s) > 0]
 
             if lang_code in sentences:
                 sentences[lang_code].extend(sentences_list)
@@ -87,17 +95,27 @@ class ProcessData:
 
         data = self.save_text_data_into_dataframe()
         data.drop_duplicates(subset="sentence", keep=False, inplace=True)
-        
+
         data['sentence'] = data['sentence'].str.lower()
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.digits_regex, " ", x)) # E.g. 12.000.000,05 or 12,000,000.05.
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.punctutations_symbols_regex, " ", x)) # For the numbers, e.g., 12/03 becomes 12 03.
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.three_dots, "", x))
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.hyphen_with_spaces, " ", x))
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.remove_space_at_the_beginning, r'\1', x))
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.int_numbers_regex, " ", x)) # Remove integer digits, e.g., 12 03.
-        data['sentence'] = data['sentence'].apply(lambda x: re.sub(self.one_or_more_spaces, " ", x))
+        # E.g. 12.000.000,05 or 12,000,000.05.
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.digits_regex, " ", x))
+        # For the numbers, e.g., 12/03 becomes 12 03.
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.punctutations_symbols_regex, " ", x))
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.three_dots, "", x))
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.hyphen_with_spaces, " ", x))
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.remove_space_at_the_beginning, r'\1', x))
+        # Remove integer digits, e.g., 12 03.
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.int_numbers_regex, " ", x))
+        data['sentence'] = data['sentence'].apply(
+            lambda x: re.sub(self.one_or_more_spaces, " ", x))
         data.loc[data['sentence'].str.len() < 10, 'sentence'] = ""
-        
+
         data.reset_index(drop=True, inplace=True)
         clean_data = data[(data["sentence"] != "") & (data["sentence"] != " ")]
         return clean_data
@@ -131,11 +149,22 @@ class ProcessData:
         return outlier_removed
 
     def normalize_dataset(self) -> pd.DataFrame:
-        """ Build a final clean dataset and return a dataframe contains sentences excluding outliers. """
+        """ Tokenize each sentence into individual words, pairing each word with its respective language. """
 
         data = self.preprocess_dataset_with_count()
         sentences_not_outliers = self.remove_outliers_data()
         # Create a dataframe with only the values that are in the normalize_sentences
-        final_clean_dataset = data[data["sentence_length"].isin(sentences_not_outliers)]
+        final_clean_dataset = data[data["sentence_length"].isin(
+            sentences_not_outliers)]
 
         return final_clean_dataset
+
+    def tokenize_sentence_to_words(self) -> pd.DataFrame:
+        """ Tokenize each sentence into individual words with the respective language pairs. """
+        tokenized_data = []
+        for _, row in self.normalize_dataset().iterrows():
+            tokens = self.word_tokenizer.tokenize(row["sentence"])
+            for token in tokens:
+                tokenized_data.append({'token': token, 'language': row["language"]})
+
+        return pd.DataFrame(tokenized_data)

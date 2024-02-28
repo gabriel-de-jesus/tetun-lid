@@ -15,7 +15,7 @@ plots = Path("plots/")
 
 # Customize file size
 BITE_SIZE = 3834110
-DATA_FRAC_FOR_CLUSTERING = 0.01
+DATA_FRAC_FOR_CLUSTERING = 0.1
 
 # Regular expressions (regex)
 # E.g., 12.000.678,05 or 12,000,000.05.

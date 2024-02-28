@@ -12,8 +12,6 @@ scikit-learn = "*"
 seaborn = "*"
 unidecode = "*"
 tensorflow = "*"
-torch = "*"
-torchvision = "*"
 tetun-tokenizer = "*"
 
 [dev-packages]

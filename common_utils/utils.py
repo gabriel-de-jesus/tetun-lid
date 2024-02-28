@@ -1,9 +1,13 @@
 import pandas as pd
 import lzma
-from unidecode import unidecode
 from pathlib import Path
 from bs4 import BeautifulSoup as bs
 
+# !/common_utils/
+#
+# utils.py
+# Gabriel de Jesus (mestregabrieldejesus@gmail.com)
+# 22-05-2023
 
 class Utils:
     """ This class contains functions for parsing and reading files. """
