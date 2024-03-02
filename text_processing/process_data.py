@@ -8,7 +8,7 @@ from common_utils.utils import Utils
 from common_utils import config
 from tetuntokenizer.tokenizer import TetunSentenceTokenizer, TetunWordTokenizer
 
-# !/text_processing/
+#!/usr/bin/env python
 #
 # process_data.py
 # Gabriel de Jesus (mestregabrieldejesus@gmail.com)

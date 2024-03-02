@@ -1,7 +1,7 @@
 from common_utils.utils import Utils
 from common_utils import config
 
-# !/
+#!/usr/bin/env python
 #
 # parse_data.py
 # Gabriel de Jesus (mestregabrieldejesus@gmail.com)

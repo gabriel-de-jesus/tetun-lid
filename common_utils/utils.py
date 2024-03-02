@@ -3,11 +3,12 @@ import lzma
 from pathlib import Path
 from bs4 import BeautifulSoup as bs
 
-# !/common_utils/
+#!/usr/bin/env python
 #
 # utils.py
 # Gabriel de Jesus (mestregabrieldejesus@gmail.com)
 # 22-05-2023
+
 
 class Utils:
     """ This class contains functions for parsing and reading files. """

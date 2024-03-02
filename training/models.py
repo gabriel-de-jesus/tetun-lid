@@ -5,7 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from typing import Callable
 
-# !/training/
+#!/usr/bin/env python
 #
 # models.py
 # Gabriel de Jesus (mestregabrieldejesus@gmail.com)

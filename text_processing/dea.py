@@ -11,7 +11,7 @@ from typing import Callable, List
 from common_utils import config
 from .process_data import ProcessData
 
-# !/text_processing/
+#!/usr/bin/env python
 #
 # dea.py
 # Gabriel de Jesus (mestregabrieldejesus@gmail.com)
